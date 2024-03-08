@@ -27,7 +27,8 @@ class LazyMongo:
         query: Dict = None,  # type: ignore
         project: Dict = None,  # type: ignore
     ):
-        coll = self[database][collection]
+        db = self[database or self.default_database]
+        coll = db[collection or self.default_collection]
 
         return coll.find(query, project)
 
@@ -37,7 +38,8 @@ class LazyMongo:
         collection: str = None,  # type: ignore
         document: Dict = None,  # type: ignore
     ):
-        coll = self[database][collection]
+        db = self[database or self.default_database]
+        coll = db[collection or self.default_collection]
 
         return coll.insert_one(document)
 
@@ -47,6 +49,7 @@ class LazyMongo:
         collection: str = None,  # type: ignore
         query: Dict = None,  # type: ignore
     ):
-        coll = self[database][collection]
+        db = self[database or self.default_database]
+        coll = db[collection or self.default_collection]
 
         return coll.count(query)
