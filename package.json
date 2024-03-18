@@ -1,6 +1,6 @@
 {
   "name": "lazy-mongo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -12,5 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "mongodb": "^6.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Llyme/lazy-mongo.git"
   }
 }
