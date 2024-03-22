@@ -41,6 +41,21 @@ class LazyMongo:
 
         return db.insert_one(collection, document)
 
+    def update_set_one(
+        self,
+        database: str = None,  # type: ignore
+        collection: str = None,  # type: ignore
+        filter: Dict = None,  # type: ignore
+        document: Dict = None,  # type: ignore
+    ):
+        db = self[database or self.default_database]
+
+        return db.update_set_one(
+            collection,
+            filter,
+            document,
+        )
+
     def count(
         self,
         database: str = None,  # type: ignore
