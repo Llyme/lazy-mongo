@@ -29,6 +29,16 @@ class LazyDatabase(NamedTuple):
 
         return coll.insert_one(document)
 
+    def update_set_one(
+        self,
+        collection: str = None,  # type: ignore
+        filter: Dict = None,  # type: ignore
+        document: Dict = None,  # type: ignore
+    ):
+        coll = self[collection or self.default_collection_name]
+
+        return coll.update_set_one(filter, document)
+
     def count(
         self,
         collection: str = None,  # type: ignore
@@ -36,4 +46,13 @@ class LazyDatabase(NamedTuple):
     ):
         coll = self[collection or self.default_collection_name]
 
-        return coll.count_documents(query)
+        return coll.count(query)
+
+    def distinct(
+        self,
+        key: str,
+        collection: str = None,  # type: ignore
+    ):
+        coll = self[collection or self.default_collection_name]
+
+        return coll.distinct(key)

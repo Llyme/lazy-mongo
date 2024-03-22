@@ -28,9 +28,8 @@ class LazyMongo:
         project: Dict = None,  # type: ignore
     ):
         db = self[database or self.default_database]
-        coll = db[collection or self.default_collection]
 
-        return coll.find(query, project)
+        return db.find(collection, query, project)
 
     def insert_one(
         self,
@@ -39,9 +38,8 @@ class LazyMongo:
         document: Dict = None,  # type: ignore
     ):
         db = self[database or self.default_database]
-        coll = db[collection or self.default_collection]
 
-        return coll.insert_one(document)
+        return db.insert_one(collection, document)
 
     def count(
         self,
@@ -50,6 +48,15 @@ class LazyMongo:
         query: Dict = None,  # type: ignore
     ):
         db = self[database or self.default_database]
-        coll = db[collection or self.default_collection]
 
-        return coll.count(query)
+        return db.count(collection, query)
+
+    def distinct(
+        self,
+        key: str,
+        database: str = None,  # type: ignore
+        collection: str = None,  # type: ignore
+    ):
+        db = self[database or self.default_database]
+
+        return db.distinct(key, collection)
