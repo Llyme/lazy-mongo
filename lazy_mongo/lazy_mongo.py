@@ -20,6 +20,17 @@ class LazyMongo:
             default_collection_name=self.default_collection,
         )
 
+    def find_one(
+        self,
+        database: str = None,
+        collection: str = None,
+        query: Dict = None,
+        project: Dict = None,
+    ):
+        db = self[database or self.default_database]
+
+        return db.find_one(collection, query, project)
+
     def find(
         self,
         database: str = None,  # type: ignore

@@ -10,6 +10,16 @@ class LazyDatabase(NamedTuple):
     def __getitem__(self, key: str):
         return LazyCollection(self.database[key])
 
+    def find_one(
+        self,
+        collection: str = None,
+        query: Dict = None,
+        project: Dict = None,
+    ):
+        coll = self[collection or self.default_collection_name]
+
+        return coll.find_one(query, project)
+
     def find(
         self,
         collection: str = None,  # type: ignore

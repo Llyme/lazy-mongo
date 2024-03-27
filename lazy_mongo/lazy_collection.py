@@ -7,6 +7,13 @@ from .insert_response import InsertResponse
 class LazyCollection(NamedTuple):
     collection: Collection
 
+    def find_one(
+        self,
+        query: Dict = None,
+        project: Dict = None,
+    ):
+        return self.collection.find_one(query, project)
+
     def find(
         self,
         query: Dict = None,  # type: ignore
