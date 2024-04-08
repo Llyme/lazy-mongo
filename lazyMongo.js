@@ -1,4 +1,4 @@
-import { MongoClient, MongoServerError, Document, AggregateOptions } from "mongodb";
+import { MongoClient, MongoServerError } from "mongodb";
 
 export class LazyMongo {
     /**
@@ -202,8 +202,8 @@ export class LazyMongo {
      * @param {object} kwargs 
      * @param {string} [kwargs.database]
      * @param {string} [kwargs.collection]
-     * @param {Document[]} [kwargs.pipeline]
-     * @param {AggregateOptions} [kwargs.options]
+     * @param {import('mongodb').Document[]} [kwargs.pipeline]
+     * @param {import('mongodb').AggregateOptions} [kwargs.options]
      */
     static aggregate(kwargs = {}) {
         const {
