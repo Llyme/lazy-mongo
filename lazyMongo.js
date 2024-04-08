@@ -1,4 +1,4 @@
-import { MongoClient, MongoServerError } from "mongodb";
+import { MongoClient, MongoServerError, Document, AggregateOptions } from "mongodb";
 
 export class LazyMongo {
     /**
@@ -195,5 +195,26 @@ export class LazyMongo {
         const coll = this.getCollection({ database, collection });
 
         return await coll.countDocuments(filter);
+    }
+
+    /**
+     * 
+     * @param {object} kwargs 
+     * @param {string} [kwargs.database]
+     * @param {string} [kwargs.collection]
+     * @param {Document[]} [kwargs.pipeline]
+     * @param {AggregateOptions} [kwargs.options]
+     */
+    static aggregate(kwargs = {}) {
+        const {
+            database,
+            collection,
+            pipeline,
+            options
+        } = kwargs;
+
+        const coll = this.getCollection({ database, collection });
+
+        return coll.aggregate(pipeline, options);
     }
 }
