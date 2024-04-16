@@ -1,5 +1,6 @@
 from typing import Dict, NamedTuple
 from pymongo.collection import Collection
+from pymongo.errors import DuplicateKeyError
 from .update_response import UpdateResponse
 from .insert_response import InsertResponse
 
@@ -33,6 +34,13 @@ class LazyCollection(NamedTuple):
                 result=result,
             )
 
+        except DuplicateKeyError as e:
+            return InsertResponse(
+                ok=False,
+                is_duplicate=True,
+                error=e,
+            )
+
         except Exception as e:
             return InsertResponse(
                 ok=False,
@@ -57,6 +65,14 @@ class LazyCollection(NamedTuple):
                 ok=True,
                 result=result,
             )
+
+        except DuplicateKeyError as e:
+            return UpdateResponse(
+                ok=False,
+                is_duplicate=True,
+                error=e,
+            )
+
         except Exception as e:
             return UpdateResponse(
                 ok=False,
