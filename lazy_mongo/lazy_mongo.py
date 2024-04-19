@@ -10,7 +10,10 @@ class LazyMongo:
         self.default_collection: str = None  # type: ignore
 
     def connect(self, uri: str):
-        self.mongo = MongoClient(uri)
+        try:
+            self.mongo = MongoClient(uri)
+        except:
+            pass
 
         return self
 
