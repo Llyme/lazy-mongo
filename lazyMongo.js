@@ -1,4 +1,20 @@
-import { MongoClient, MongoServerError, MongoError } from "mongodb";
+import { MongoClient, MongoError, UpdateResult, InsertOneResult } from "mongodb";
+
+/**
+ * @typedef {Object} InsertOneResponse
+ * @property {boolean} ok
+ * @property {InsertOneResult} [result]
+ * @property {boolean} isDuplicate
+ * @property {MongoError} [error]
+ */
+
+/**
+ * @typedef {Object} UpdateResponse
+ * @property {boolean} ok
+ * @property {UpdateResult} [result]
+ * @property {boolean} isDuplicate
+ * @property {MongoError} [error]
+ */
 
 export class LazyMongo {
     /**
@@ -87,6 +103,8 @@ export class LazyMongo {
      * @param {object} [kwargs.filter]
      * @param {object} [kwargs.update]
      * @param {import('mongodb').UpdateOptions} [kwargs.options]
+     * 
+     * @returns {UpdateResponse}
      */
     static async updateSetOne(kwargs = {}) {
         const {
@@ -116,13 +134,15 @@ export class LazyMongo {
 
             return {
                 ok: true,
-                result
+                result,
+                isDuplicate: false
             };
         } catch (error) {
-            if (!(error instanceof MongoServerError))
+            if (!(error instanceof MongoError))
                 return {
                     ok: false,
-                    error
+                    error,
+                    isDuplicate: false,
                 };
 
             if (this.log)
@@ -130,7 +150,8 @@ export class LazyMongo {
 
             return {
                 ok: false,
-                error
+                error,
+                isDuplicate: error.code == 11000
             };
         }
     }
@@ -141,6 +162,8 @@ export class LazyMongo {
      * @param {string} [kwargs.database]
      * @param {string} [kwargs.collection]
      * @param {object} [kwargs.document]
+     * 
+     * @returns {InsertOneResponse}
      */
     static async insertOne(kwargs = {}) {
         const {
@@ -159,18 +182,25 @@ export class LazyMongo {
 
             return {
                 ok: true,
-                result
+                result,
+                isDuplicate: false
             };
+
         } catch (error) {
             if (!(error instanceof MongoError))
-                throw error;
+                return {
+                    ok: false,
+                    error,
+                    isDuplicate: false,
+                };
 
             if (this.log)
                 console.log(`[MongoDB.Error] ${coll.dbName}.${coll.collectionName} ${error.code}`);
 
             return {
                 ok: false,
-                error
+                error,
+                isDuplicate: error.code == 11000
             };
         }
     }
