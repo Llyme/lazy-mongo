@@ -104,7 +104,7 @@ export class LazyMongo {
      * @param {object} [kwargs.update]
      * @param {import('mongodb').UpdateOptions} [kwargs.options]
      * 
-     * @returns {UpdateResponse}
+     * @returns {Promise<UpdateResponse>}
      */
     static async updateSetOne(kwargs = {}) {
         const {
@@ -163,7 +163,7 @@ export class LazyMongo {
      * @param {string} [kwargs.collection]
      * @param {object} [kwargs.document]
      * 
-     * @returns {InsertOneResponse}
+     * @returns {Promise<InsertOneResponse>}
      */
     static async insertOne(kwargs = {}) {
         const {
