@@ -1,4 +1,4 @@
-import { MongoClient, MongoServerError } from "mongodb";
+import { MongoClient, MongoServerError, MongoError } from "mongodb";
 
 export class LazyMongo {
     /**
@@ -162,11 +162,8 @@ export class LazyMongo {
                 result
             };
         } catch (error) {
-            if (!(error instanceof MongoServerError))
-                return {
-                    ok: false,
-                    error
-                };
+            if (!(error instanceof MongoError))
+                throw error;
 
             if (this.log)
                 console.log(`[MongoDB.Error] ${coll.dbName}.${coll.collectionName} ${error.code}`);
