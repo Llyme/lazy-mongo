@@ -1,9 +1,9 @@
-import { MongoClient, MongoError, UpdateResult, InsertOneResult } from "mongodb";
+import { MongoClient, MongoError } from "mongodb";
 
 /**
  * @typedef {Object} InsertOneResponse
  * @property {boolean} ok
- * @property {InsertOneResult} [result]
+ * @property {import('mongodb').InsertOneResult} [result]
  * @property {boolean} isDuplicate
  * @property {MongoError} [error]
  */
@@ -11,7 +11,7 @@ import { MongoClient, MongoError, UpdateResult, InsertOneResult } from "mongodb"
 /**
  * @typedef {Object} UpdateResponse
  * @property {boolean} ok
- * @property {UpdateResult} [result]
+ * @property {import('mongodb').UpdateResult} [result]
  * @property {boolean} isDuplicate
  * @property {MongoError} [error]
  */
