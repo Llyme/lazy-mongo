@@ -1,4 +1,5 @@
 import { MongoClient, MongoError } from "mongodb";
+import chalk from "chalk";
 
 /**
  * @typedef {Object} InsertOneResponse
@@ -79,17 +80,19 @@ export class LazyMongo {
      * @param {object} kwargs 
      * @param {string} [kwargs.database]
      * @param {string} [kwargs.collection]
-     * @param {object} [kwargs.query]
+     * @param {object} [kwargs.filter]
+     * @param {import('mongodb').FindOptions<import('mongodb').Document>} [kwargs.options]
      */
     static async *find(kwargs = {}) {
         const {
             database,
             collection,
-            query
+            filter,
+            options
         } = kwargs;
 
         const coll = this.getCollection({ database, collection });
-        const docs = coll.find(query);
+        const docs = coll.find(filter, options);
 
         for await (const doc of docs)
             yield doc;
@@ -100,13 +103,34 @@ export class LazyMongo {
      * @param {object} kwargs 
      * @param {string} [kwargs.database]
      * @param {string} [kwargs.collection]
-     * @param {object} [kwargs.filter]
-     * @param {object} [kwargs.update]
+     * @param {import('mongodb').Filter<import('mongodb').Document>} [kwargs.filter]
+     * @param {import('mongodb').FindOptions<import('mongodb').Document>} [kwargs.options]
+     */
+    static async findOne(kwargs = {}) {
+        const {
+            database,
+            collection,
+            filter,
+            options
+        } = kwargs;
+
+        const coll = this.getCollection({ database, collection });
+
+        return await coll.findOne(filter, options);
+    }
+
+    /**
+     * 
+     * @param {object} kwargs 
+     * @param {string} [kwargs.database]
+     * @param {string} [kwargs.collection]
+     * @param {import('mongodb').Filter<import('mongodb').Document>} [kwargs.filter]
+     * @param {import('mongodb').Document[] | import('mongodb').UpdateFilter<import('mongodb').Document>} kwargs.update
      * @param {import('mongodb').UpdateOptions} [kwargs.options]
      * 
      * @returns {Promise<UpdateResponse>}
      */
-    static async updateSetOne(kwargs = {}) {
+    static async updateOne(kwargs = {}) {
         const {
             database,
             collection,
@@ -120,23 +144,24 @@ export class LazyMongo {
         try {
             const result = await coll.updateOne(
                 filter,
-                {
-                    $set: update
-                },
-                {
-                    upsert: false,
-                    ...options
-                }
+                update,
+                options
             );
 
             if (this.log && result.acknowledged)
-                console.log(`[MongoDB.Update] ${coll.dbName}.${coll.collectionName}.${result.modifiedCount}`);
+                console.log(
+                    chalk.bgGreen('[MongoDB.Update]'),
+                    chalk.blue(coll.dbName),
+                    chalk.cyan(coll.collectionName),
+                    chalk.bgWhite(result.modifiedCount)
+                );
 
             return {
                 ok: true,
                 result,
                 isDuplicate: false
             };
+
         } catch (error) {
             if (!(error instanceof MongoError))
                 return {
@@ -146,7 +171,12 @@ export class LazyMongo {
                 };
 
             if (this.log)
-                console.log(`[MongoDB.Error] ${coll.dbName}.${coll.collectionName} ${error.code}`);
+                console.log(
+                    chalk.bgRed('[MongoDB.Update]'),
+                    chalk.blue(coll.dbName),
+                    chalk.cyan(coll.collectionName),
+                    chalk.red(error.code)
+                );
 
             return {
                 ok: false,
@@ -161,7 +191,37 @@ export class LazyMongo {
      * @param {object} kwargs 
      * @param {string} [kwargs.database]
      * @param {string} [kwargs.collection]
+     * @param {import('mongodb').Filter<import('mongodb').Document>} [kwargs.filter]
+     * @param {object} kwargs.update
+     * @param {import('mongodb').UpdateOptions} [kwargs.options]
+     * 
+     * @returns {Promise<UpdateResponse>}
+     */
+    static async updateSetOne(kwargs = {}) {
+        const {
+            update,
+            options
+        } = kwargs;
+
+        return await this.updateOne({
+            ...kwargs,
+            update: {
+                $set: update
+            },
+            options: {
+                upsert: false,
+                ...options
+            }
+        });
+    }
+
+    /**
+     * 
+     * @param {object} kwargs 
+     * @param {string} [kwargs.database]
+     * @param {string} [kwargs.collection]
      * @param {object} [kwargs.document]
+     * @param {import('mongodb').InsertOneOptions} [kwargs.options]
      * 
      * @returns {Promise<InsertOneResponse>}
      */
@@ -169,16 +229,22 @@ export class LazyMongo {
         const {
             database,
             collection,
-            document
+            document,
+            options
         } = kwargs;
 
         const coll = this.getCollection({ database, collection });
 
         try {
-            const result = await coll.insertOne(document);
+            const result = await coll.insertOne(document, options);
 
             if (this.log && result.acknowledged)
-                console.log(`[MongoDB.Insert] ${coll.dbName}.${coll.collectionName}.${result.insertedId}`);
+                console.log(
+                    chalk.bgGreen('[MongoDB.Insert]'),
+                    chalk.blue(coll.dbName),
+                    chalk.cyan(coll.collectionName),
+                    result.insertedId
+                );
 
             return {
                 ok: true,
@@ -195,7 +261,12 @@ export class LazyMongo {
                 };
 
             if (this.log)
-                console.log(`[MongoDB.Error] ${coll.dbName}.${coll.collectionName} ${error.code}`);
+                console.log(
+                    chalk.bgRed('[MongoDB.Insert]'),
+                    chalk.blue(coll.dbName),
+                    chalk.cyan(coll.collectionName),
+                    chalk.red(error.code)
+                );
 
             return {
                 ok: false,
