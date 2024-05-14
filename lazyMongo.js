@@ -150,10 +150,12 @@ export class LazyMongo {
 
             if (this.log && result.acknowledged)
                 console.log(
-                    chalk.bgGreen('[MongoDB.Update]'),
-                    chalk.blue(coll.dbName),
-                    chalk.cyan(coll.collectionName),
-                    chalk.bgWhite(result.modifiedCount)
+                    result.modifiedCount > 0
+                        ? chalk.bgGreen('[MongoDB.Update]')
+                        : chalk.bgYellow('[MongoDB.Update]'),
+                    chalk.blue.bold(coll.dbName),
+                    chalk.cyan.bold(coll.collectionName),
+                    result.modifiedCount
                 );
 
             return {
@@ -173,8 +175,8 @@ export class LazyMongo {
             if (this.log)
                 console.log(
                     chalk.bgRed('[MongoDB.Update]'),
-                    chalk.blue(coll.dbName),
-                    chalk.cyan(coll.collectionName),
+                    chalk.blue.bold(coll.dbName),
+                    chalk.cyan.bold(coll.collectionName),
                     chalk.red(error.code)
                 );
 
@@ -241,9 +243,9 @@ export class LazyMongo {
             if (this.log && result.acknowledged)
                 console.log(
                     chalk.bgGreen('[MongoDB.Insert]'),
-                    chalk.blue(coll.dbName),
-                    chalk.cyan(coll.collectionName),
-                    result.insertedId
+                    chalk.blue.bold(coll.dbName),
+                    chalk.cyan.bold(coll.collectionName),
+                    chalk.bold(result.insertedId.toHexString())
                 );
 
             return {
@@ -263,9 +265,9 @@ export class LazyMongo {
             if (this.log)
                 console.log(
                     chalk.bgRed('[MongoDB.Insert]'),
-                    chalk.blue(coll.dbName),
-                    chalk.cyan(coll.collectionName),
-                    chalk.red(error.code)
+                    chalk.blue.bold(coll.dbName),
+                    chalk.cyan.bold(coll.collectionName),
+                    chalk.red.bold(error.code)
                 );
 
             return {
