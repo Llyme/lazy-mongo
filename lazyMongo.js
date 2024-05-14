@@ -127,6 +127,7 @@ export class LazyMongo {
      * @param {import('mongodb').Filter<import('mongodb').Document>} [kwargs.filter]
      * @param {import('mongodb').Document[] | import('mongodb').UpdateFilter<import('mongodb').Document>} kwargs.update
      * @param {import('mongodb').UpdateOptions} [kwargs.options]
+     * @param {boolean} [kwargs.log]
      * 
      * @returns {Promise<UpdateResponse>}
      */
@@ -136,7 +137,8 @@ export class LazyMongo {
             collection,
             filter,
             update,
-            options
+            options,
+            log = this.log
         } = kwargs;
 
         const coll = this.getCollection({ database, collection });
@@ -148,7 +150,7 @@ export class LazyMongo {
                 options
             );
 
-            if (this.log && result.acknowledged)
+            if (log && result.acknowledged)
                 console.log(
                     result.modifiedCount > 0
                         ? chalk.bgGreen('[MongoDB.Update]')
@@ -172,7 +174,7 @@ export class LazyMongo {
                     isDuplicate: false,
                 };
 
-            if (this.log)
+            if (log)
                 console.log(
                     chalk.bgRed('[MongoDB.Update]'),
                     chalk.blue.bold(coll.dbName),
@@ -224,6 +226,7 @@ export class LazyMongo {
      * @param {string} [kwargs.collection]
      * @param {object} [kwargs.document]
      * @param {import('mongodb').InsertOneOptions} [kwargs.options]
+     * @param {boolean} [kwargs.log]
      * 
      * @returns {Promise<InsertOneResponse>}
      */
@@ -232,7 +235,8 @@ export class LazyMongo {
             database,
             collection,
             document,
-            options
+            options,
+            log = this.log
         } = kwargs;
 
         const coll = this.getCollection({ database, collection });
@@ -240,7 +244,7 @@ export class LazyMongo {
         try {
             const result = await coll.insertOne(document, options);
 
-            if (this.log && result.acknowledged)
+            if (log && result.acknowledged)
                 console.log(
                     chalk.bgGreen('[MongoDB.Insert]'),
                     chalk.blue.bold(coll.dbName),
@@ -262,7 +266,7 @@ export class LazyMongo {
                     isDuplicate: false,
                 };
 
-            if (this.log)
+            if (log)
                 console.log(
                     chalk.bgRed('[MongoDB.Insert]'),
                     chalk.blue.bold(coll.dbName),
