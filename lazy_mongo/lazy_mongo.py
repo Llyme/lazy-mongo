@@ -1,6 +1,7 @@
 from typing import Dict
 from pymongo import MongoClient
 from .lazy_database import LazyDatabase
+from pymongo.typings import _Pipeline
 
 
 class LazyMongo:
@@ -8,6 +9,7 @@ class LazyMongo:
         self.mongo: MongoClient = None  # type: ignore
         self.default_database: str = None  # type: ignore
         self.default_collection: str = None  # type: ignore
+        self.log: bool = True
 
     def connect(self, uri: str):
         try:
@@ -19,6 +21,7 @@ class LazyMongo:
 
     def __getitem__(self, key: str):
         return LazyDatabase(
+            mongo=self,
             database=self.mongo[key or self.default_database],
             default_collection_name=self.default_collection,
         )
@@ -89,3 +92,14 @@ class LazyMongo:
         db = self[database or self.default_database]
 
         return db.distinct(key, collection)
+
+    def aggregate(
+        self,
+        pipeline: _Pipeline,
+        database: str = None,
+        collection: str = None,
+        **kwargs,
+    ):
+        db = self[database or self.default_database]
+
+        return db.aggregate(pipeline, collection, **kwargs)

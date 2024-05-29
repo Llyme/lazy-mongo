@@ -1,11 +1,18 @@
-from typing import Dict, NamedTuple
+from typing import Dict, NamedTuple, TYPE_CHECKING
 from pymongo.collection import Collection
+from pymongo.typings import _Pipeline
 from pymongo.errors import DuplicateKeyError
 from .update_response import UpdateResponse
 from .insert_response import InsertResponse
 
+if TYPE_CHECKING:
+    from .lazy_database import LazyDatabase
+    from .lazy_mongo import LazyMongo
+
 
 class LazyCollection(NamedTuple):
+    mongo: "LazyMongo"
+    database: "LazyDatabase"
     collection: Collection
 
     def find_one(
@@ -29,12 +36,18 @@ class LazyCollection(NamedTuple):
         try:
             result = self.collection.insert_one(document)
 
+            if self.mongo.log:
+                print("[Mongo.Insert]", result.inserted_id)
+
             return InsertResponse(
                 ok=True,
                 result=result,
             )
 
         except DuplicateKeyError as e:
+            if self.mongo.log:
+                print("[Mongo.Duplicate]", e)
+
             return InsertResponse(
                 ok=False,
                 is_duplicate=True,
@@ -42,6 +55,9 @@ class LazyCollection(NamedTuple):
             )
 
         except Exception as e:
+            if self.mongo.log:
+                print("[Mongo.Error]", e)
+
             return InsertResponse(
                 ok=False,
                 error=e,
@@ -61,12 +77,21 @@ class LazyCollection(NamedTuple):
                 upsert=False,
             )
 
+            if self.mongo.log:
+                print(
+                    "[Mongo.Update]",
+                    result.modified_count,
+                )
+
             return UpdateResponse(
                 ok=True,
                 result=result,
             )
 
         except DuplicateKeyError as e:
+            if self.mongo.log:
+                print("[Mongo.Duplicate]", e)
+
             return UpdateResponse(
                 ok=False,
                 is_duplicate=True,
@@ -74,6 +99,9 @@ class LazyCollection(NamedTuple):
             )
 
         except Exception as e:
+            if self.mongo.log:
+                print("[Mongo.Error]", e)
+
             return UpdateResponse(
                 ok=False,
                 error=e,
@@ -87,3 +115,9 @@ class LazyCollection(NamedTuple):
 
     def distinct(self, key: str):  # type: ignore
         return self.collection.distinct(key)
+
+    def aggregate(self, pipeline: _Pipeline, **kwargs):
+        return self.collection.aggregate(
+            pipeline,
+            **kwargs,
+        )

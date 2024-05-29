@@ -1,14 +1,23 @@
-from typing import Dict, NamedTuple
+from typing import Dict, NamedTuple, TYPE_CHECKING
 from pymongo.database import Database
 from .lazy_collection import LazyCollection
+from pymongo.typings import _Pipeline
+
+if TYPE_CHECKING:
+    from .lazy_mongo import LazyMongo
 
 
 class LazyDatabase(NamedTuple):
+    mongo: "LazyMongo"
     database: Database
     default_collection_name: str = None  # type: ignore
 
     def __getitem__(self, key: str):
-        return LazyCollection(self.database[key])
+        return LazyCollection(
+            mongo=self.mongo,
+            database=self,
+            collection=self.database[key],
+        )
 
     def find_one(
         self,
@@ -66,3 +75,13 @@ class LazyDatabase(NamedTuple):
         coll = self[collection or self.default_collection_name]
 
         return coll.distinct(key)
+
+    def aggregate(
+        self,
+        pipeline: _Pipeline,
+        collection: str = None,  # type: ignore
+        **kwargs,
+    ):
+        coll = self[collection or self.default_collection_name]
+
+        return coll.aggregate(pipeline, **kwargs)

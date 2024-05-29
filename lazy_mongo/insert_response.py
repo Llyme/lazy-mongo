@@ -1,5 +1,4 @@
-from typing import Dict, NamedTuple
-from pymongo.collection import Collection
+from typing import NamedTuple
 from pymongo.results import InsertOneResult
 
 
