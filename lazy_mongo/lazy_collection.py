@@ -46,7 +46,7 @@ class LazyCollection(NamedTuple):
 
         except DuplicateKeyError as e:
             if self.mongo.log:
-                print("[Mongo.Duplicate]", e)
+                print("[Mongo.Duplicate]", e.code)
 
             return InsertResponse(
                 ok=False,
