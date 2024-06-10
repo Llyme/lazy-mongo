@@ -17,8 +17,8 @@ class LazyCollection(NamedTuple):
 
     def find_one(
         self,
-        query: Dict = None,
-        project: Dict = None,
+        query: Dict = None,  # type: ignore
+        project: Dict = None,  # type: ignore
     ):
         return self.collection.find_one(query, project)
 
@@ -63,24 +63,24 @@ class LazyCollection(NamedTuple):
                 error=e,
             )
 
-    def update_set_one(
+    def update_one(
         self,
         filter: Dict = None,  # type: ignore
-        document: Dict = None,  # type: ignore
+        update: Dict = None,  # type: ignore
+        **kwargs,
     ):
         try:
             result = self.collection.update_one(
                 filter=filter,
-                update={
-                    "$set": document,
-                },
+                update=update,
                 upsert=False,
+                **kwargs,
             )
 
             if self.mongo.log:
                 print(
                     "[Mongo.Update]",
-                    result.modified_count,
+                    result.upserted_id or result.modified_count,
                 )
 
             return UpdateResponse(
@@ -106,6 +106,24 @@ class LazyCollection(NamedTuple):
                 ok=False,
                 error=e,
             )
+
+    def update_set_one(
+        self,
+        filter: Dict = None,  # type: ignore
+        document: Dict = None,  # type: ignore
+    ):
+        """
+        Shortcut for `$set`.
+
+        Upsert = `False`
+        """
+        return self.update_one(
+            filter,
+            update={
+                "$set": document,
+            },
+            upsert=False,
+        )
 
     def count(
         self,

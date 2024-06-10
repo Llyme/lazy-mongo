@@ -21,9 +21,9 @@ class LazyDatabase(NamedTuple):
 
     def find_one(
         self,
-        collection: str = None,
-        query: Dict = None,
-        project: Dict = None,
+        collection: str = None,  # type: ignore
+        query: Dict = None,  # type: ignore
+        project: Dict = None,  # type: ignore
     ):
         coll = self[collection or self.default_collection_name]
 
@@ -47,6 +47,17 @@ class LazyDatabase(NamedTuple):
         coll = self[collection or self.default_collection_name]
 
         return coll.insert_one(document)
+
+    def update_one(
+        self,
+        collection: str = None,  # type: ignore
+        filter: Dict = None,  # type: ignore
+        update: Dict = None,  # type: ignore
+        **kwargs,
+    ):
+        coll = self[collection or self.default_collection_name]
+
+        return coll.update_one(filter, update, **kwargs)
 
     def update_set_one(
         self,

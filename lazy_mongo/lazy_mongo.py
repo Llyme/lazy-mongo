@@ -28,10 +28,10 @@ class LazyMongo:
 
     def find_one(
         self,
-        database: str = None,
-        collection: str = None,
-        query: Dict = None,
-        project: Dict = None,
+        database: str = None,  # type: ignore
+        collection: str = None,  # type: ignore
+        query: Dict = None,  # type: ignore
+        project: Dict = None,  # type: ignore
     ):
         db = self[database or self.default_database]
 
@@ -57,6 +57,23 @@ class LazyMongo:
         db = self[database or self.default_database]
 
         return db.insert_one(collection, document)
+
+    def update_one(
+        self,
+        database: str = None,  # type: ignore
+        collection: str = None,  # type: ignore
+        filter: Dict = None,  # type: ignore
+        update: Dict = None,  # type: ignore
+        **kwargs,
+    ):
+        db = self[database or self.default_database]
+
+        return db.update_set_one(
+            collection,
+            filter,
+            update,
+            **kwargs,
+        )
 
     def update_set_one(
         self,
@@ -96,8 +113,8 @@ class LazyMongo:
     def aggregate(
         self,
         pipeline: _Pipeline,
-        database: str = None,
-        collection: str = None,
+        database: str = None,  # type: ignore
+        collection: str = None,  # type: ignore
         **kwargs,
     ):
         db = self[database or self.default_database]
