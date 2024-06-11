@@ -73,7 +73,6 @@ class LazyCollection(NamedTuple):
             result = self.collection.update_one(
                 filter=filter,
                 update=update,
-                upsert=False,
                 **kwargs,
             )
 

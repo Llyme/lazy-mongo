@@ -68,7 +68,7 @@ class LazyMongo:
     ):
         db = self[database or self.default_database]
 
-        return db.update_set_one(
+        return db.update_one(
             collection,
             filter,
             update,
