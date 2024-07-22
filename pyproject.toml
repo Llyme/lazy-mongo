@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lazy-mongo"
-version = "0.3.4"
+version = "0.3.5"
 description = ""
 authors = ["MisterNyan <michael.edmund.wong@gmail.com>"]
 readme = "README.md"

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 from pymongo import MongoClient
 from .lazy_database import LazyDatabase
 from pymongo.typings import _Pipeline
@@ -11,9 +11,13 @@ class LazyMongo:
         self.default_collection: str = None  # type: ignore
         self.log: bool = True
 
-    def connect(self, uri: str):
+    def connect(self, uri_or_client: Union[str, MongoClient]):
+        if isinstance(uri_or_client, MongoClient):
+            self.mongo = uri_or_client
+            return self
+
         try:
-            self.mongo = MongoClient(uri)
+            self.mongo = MongoClient(uri_or_client)
         except:
             pass
 
